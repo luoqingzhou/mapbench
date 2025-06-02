@@ -1,4 +1,4 @@
-from .metrics import metric_template
+from .metrics.metrics import metric_template
 
 def evaluate(ref_adata, query_adata, batch_key, label_key, predicted_label_key):
     """
