@@ -12,6 +12,7 @@ def uncertainty(
     n_neighbors=50,
     threshold=1.0,
     pred_unknown=False,
+    return_adata=True
 ):
     """
     Calculate uncertainty metric using weighted KNN between ref and query cells.
@@ -103,5 +104,8 @@ def uncertainty(
 
     print("Uncertainty calculation finished!")
 
+    adata.uns['uncertainty'] = uncertainties
+    if return_adata:
+        return adata
     # return pred_labels, uncertainties
     return uncertainties
