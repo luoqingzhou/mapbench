@@ -11,17 +11,17 @@ A benchmarking toolkit for evaluating reference mapping in single-cell atlas stu
 1. Configure mapbench Conda Environment
 
 ```bash
-mamba create -n mapbench python=3.10 && y && mamba activate mapbench
+conda create -n mapbench python=3.10 && y && conda activate mapbench
 ```
 
 2.  Install Required Environments and Dependencies
 Install R environment, compilation tools, and prerequisite packages:
 
 ```bash
-mamba install r-base=4.3.1
-mamba install compilers
-mamba install -c conda-forge xz zlib
-mamba install bioconda::bioconductor-edger=4.0.16
+conda install r-base=4.3.1
+conda install compilers
+conda install -c conda-forge xz zlib
+conda install bioconda::bioconductor-edger=4.0.16
 ```
 
 3. Compile and Install milopy Package
