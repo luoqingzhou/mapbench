@@ -41,7 +41,7 @@ def DALogFC(
     if 'neighbors' not in adata.uns:
         sc.pp.neighbors(adata, use_rep=embedding, n_neighbors=k)
     run_milo(adata, ref_query_key, ref_key, query_key, batch_key, celltype_key, milo_design)
-
+    
     sample_adata = adata.uns["nhood_adata"].T.copy()
     sample_adata.var["OOR_score"] = sample_adata.var["logFC"].copy()
     sample_adata.var["OOR_signif"] = (
