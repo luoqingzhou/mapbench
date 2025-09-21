@@ -12,9 +12,9 @@ setup(name='milopy',
           "pandas",
           "anndata",
           "scanpy>=1.6.0",
-          "scipy",
+          "scipy==1.14.1",
           "numpy",
           "matplotlib",
-          "rpy2 >= 3.3.5"
+          "rpy2 == 3.4.2"
       ],
       zip_safe=False)

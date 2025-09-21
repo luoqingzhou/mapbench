@@ -7,7 +7,7 @@ setup(
     author='Zikang Yin',
     author_email='yzk23@mails.tsinghua.edu.cn',
     packages=find_packages(),
-    install_requires=[
+     install_requires=[
         'scanpy',
         'anndata',
         'numpy',
@@ -15,6 +15,7 @@ setup(
         'pandas',
         'matplotlib',
         'mapqc',
+        'jupyter'
     ],
     python_requires='>=3.10',
 )
