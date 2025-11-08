@@ -28,7 +28,7 @@ def plot_uncertainty(adata, output_dir="./"):
     print("✅ Saved: uncertainty_plot.pdf")
 
 
-def plot_DAlogFC(adata, output_dir="."):
+def plot_DAlogFC(adata, output_dir=".", min_logFC=1, alpha=0.001):
     """Plot cell DAlogFC scores with check for pre-computed values"""
     if 'nhood_adata' not in adata.uns:
         print("→ Computing DAlogFC...")
@@ -43,8 +43,8 @@ def plot_DAlogFC(adata, output_dir="."):
     plt.rcParams["figure.figsize"] = [10, 10]
     milopl.plot_nhood_graph(
         adata,
-        min_logFC=2,
-        alpha=0.001,  # SpatialFDR
+        min_logFC=min_logFC,
+        alpha=alpha,  # SpatialFDR
         min_size=1,
         show=False
     )

@@ -24,7 +24,7 @@ def run_evaluation(adata_path, celltype_key, batch_key, mapqc_config, output_dir
     assert "oor_celltype" in adata.uns, "Missing `oor_celltype` in adata.uns"
     assert "ref_query" in adata.obs, "Missing `ref_query` in adata.obs"
     target_celltype = adata.uns["oor_celltype"]
-
+    
     # ======== 添加 case/control 标签 ========
     adata.obs['case_control'] = 'not_query'  # 先初始化所有样本为 'not_query'（字符串类型）
     query_mask = adata.obs['ref_query'] == 'query'  # 筛选 query 样本
