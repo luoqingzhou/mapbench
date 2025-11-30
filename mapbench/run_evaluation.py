@@ -53,6 +53,29 @@ def run_evaluation(adata_path, celltype_key, batch_key, mapqc_config, output_dir
     adata_subset = adata[adata.obs_names.isin(idx)].copy()
     y_true = adata_subset.obs[celltype_key] == target_celltype
     y_pred = adata.uns["nhood_adata"].obs["logFC"]
+
+    # adata.obs["is_abnormal"] = (adata.obs[celltype_key] == target_celltype).astype(int)
+
+    # # 2. 获取邻域-细胞对应矩阵（groups_mat：[邻域数 × 总细胞数]，1=细胞属于该邻域）
+    # sample_adata = adata.uns["sample_adata"]
+    # groups_mat = sample_adata.varm["groups"].copy()  # 来自 DALogFC 中 sample_adata.varm["groups"] = adata.obsm["nhoods"].T
+
+    # # 3. 计算每个邻域的“异常细胞数”和“异常细胞占比”
+    # # 3.1 筛选异常细胞列，统计每个邻域的异常细胞数（sum(1) 按行求和=每个邻域的异常细胞数）
+    # n_OOR_cells = groups_mat[:, adata.obs["is_abnormal"] == 1].toarray().sum(1)
+    # # 3.2 计算每个邻域的总细胞数（sum(1) 按行求和=每个邻域的总细胞数）
+    # total_cells_per_nhood = np.array(groups_mat.sum(1)).ravel()
+    # # 3.3 异常细胞占比（避免分母为0，加1e-10）
+    # frac_OOR_cells = n_OOR_cells / (total_cells_per_nhood + 1e-10)
+
+    # # 4. 按需求设置阈值：异常细胞占比 ≥ 最大占比的20% → 视为异常邻域（软标签逻辑）
+    # max_frac = frac_OOR_cells.max()
+    # OOR_thresh = 0.2 * max_frac  # 20% of max fraction（与 make_OOR_per_group 逻辑一致）
+    # y_true = (frac_OOR_cells > OOR_thresh).astype(int)  # 邻域级真实标签（1=异常邻域，0=非异常）
+
+    # # 5. 获取邻域级预测分数 y_pred（即 logFC，与 y_true 维度完全一致）
+    # y_pred = adata.uns["nhood_adata"].obs["logFC"].values
+
     if y_true.sum() == 0:
         print(f"Warning: No samples found for target cell type '{target_celltype}' in DAlogFC scores.")
         da_auprc = 0
