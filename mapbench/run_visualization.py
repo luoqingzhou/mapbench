@@ -9,6 +9,7 @@ import milopy.plot as milopl
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib.collections import PathCollection
 
 pd.DataFrame.iteritems = pd.DataFrame.items
 
@@ -23,8 +24,25 @@ def plot_uncertainty(adata, output_dir="./"):
     print("→ Plotting uncertainty...")
     adata_query = adata[adata.obs["ref_query"] == "query"].copy()
     adata_query.obs["uncertainty"] = adata.uns['uncertainty']
+    # sc.pl.umap 绘图，但 fig=plt.gcf() 
     sc.pl.umap(adata_query, color="uncertainty", title="Uncertainty", show=False, frameon=False, cmap='RdBu_r')
-    plt.savefig(os.path.join(output_dir, "uncertainty_plot.pdf"))
+    
+    # 获取当前图形对象
+    fig = plt.gcf()
+    
+    # 1. 栅格化点位以减小 PDF 文件大小
+    for ax in fig.get_axes():
+        for child in ax.get_children():
+            # 识别散点图的点集 (PathCollection)
+            if isinstance(child, PathCollection):
+                child.set_rasterized(True) # 启用栅格化
+
+    # 2. 保存时使用 bbox_inches='tight' 修正图例截断并设置 DPI
+    plt.savefig(
+        os.path.join(output_dir, "uncertainty_plot.pdf"),
+        bbox_inches='tight', # 确保图例不被截断
+        dpi=300              # 设置栅格化图像的分辨率
+    )
     print("✅ Saved: uncertainty_plot.pdf")
 
 
@@ -44,9 +62,27 @@ def plot_DAlogFC(adata, output_dir=".", **kwargs):
     milopl.plot_nhood_graph(
         adata,
         show=False,
+        min_size=1,
         **kwargs
     )
-    plt.savefig(os.path.join(output_dir, "DAlogFC_plot.pdf"))
+    
+    # 获取当前图形对象
+    fig = plt.gcf()
+    
+    # 1. 栅格化点位以减小 PDF 文件大小
+    # 尽管 milopl.plot_nhood_graph 主要绘制邻域，但为了覆盖可能的背景点或确保其他 PathCollection 元素被处理
+    for ax in fig.get_axes():
+        for child in ax.get_children():
+            # 识别散点图的点集 (PathCollection)
+            if isinstance(child, PathCollection):
+                child.set_rasterized(True) # 启用栅格化
+
+    # 2. 保存时使用 bbox_inches='tight' 修正图例截断并设置 DPI
+    plt.savefig(
+        os.path.join(output_dir, "DAlogFC_plot.pdf"),
+        bbox_inches='tight', # 确保图例不被截断
+        dpi=300              # 设置栅格化图像的分辨率
+    )
     print("✅ Saved: DAlogFC_plot.pdf")
 
 
@@ -88,7 +124,21 @@ def plot_mapQC(adata, output_dir="."):
 
     print("→ Plotting mapQC...")
     fig = mapqc.pl.umap.mapqc_scores_binary(adata, return_fig=True)
-    fig.savefig(os.path.join(output_dir, "mapQC_plot.pdf"))
+
+    # 1. 栅格化点位以减小 PDF 文件大小
+    for ax in fig.get_axes():
+        for child in ax.get_children():
+            # 识别散点图的点集
+            if isinstance(child, PathCollection):
+                child.set_rasterized(True) # 启用栅格化
+
+    # 2. 保存时使用 bbox_inches='tight' 修正图例截断
+    fig.savefig(
+        os.path.join(output_dir, "mapQC_plot.pdf"), 
+        bbox_inches='tight', # 确保图例不被截断
+        dpi=300              # 设置栅格化图像的分辨率
+    ) 
+
     print("✅ Saved: mapQC_plot.pdf")
 
 

@@ -18,8 +18,14 @@ def run_evaluation(adata_path, celltype_key, batch_key, mapqc_config, output_dir
     Parameters:
     - adata: AnnData object (must contain .uns['oor_celltype'])
     """
-    adata = sc.read_h5ad(adata_path)
-    adata_name = os.path.basename(adata_path).replace(".h5ad", "")
+    if isinstance(adata_path, str):
+        # 如果是字符串，当作文件路径处理
+        adata = sc.read_h5ad(adata_path)
+        adata_name = os.path.basename(adata_path).replace(".h5ad", "")
+    else:
+        # 如果是AnnData对象
+        adata = adata_path
+        adata_name = "unnamed_adata"  # 或者可以设置一个默认名称
 
     assert "oor_celltype" in adata.uns, "Missing `oor_celltype` in adata.uns"
     assert "ref_query" in adata.obs, "Missing `ref_query` in adata.obs"
