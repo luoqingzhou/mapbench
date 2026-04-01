@@ -1,7 +1,7 @@
 import scanpy as sc
 import os
 import matplotlib.pyplot as plt
-from mapbench.metrics import uncertainty, DALogFC, MapQC
+from mapbench.metrics import prob_uncertainty, dist_uncertainty, DALogFC, MapQC
 import mapqc
 import milopy.utils
 import milopy.plot as milopl
@@ -14,18 +14,18 @@ from matplotlib.collections import PathCollection
 pd.DataFrame.iteritems = pd.DataFrame.items
 
 
-def plot_uncertainty(adata, output_dir="./"):
-    """Plot cell uncertainty scores with check for pre-computed values"""
-    if 'uncertainty' not in adata.uns:
-        print("→ Computing uncertainty...")
-        adata = uncertainty(adata)
+def plot_prob_uncertainty(adata, output_dir="./"):
+    """Plot cell prob_uncertainty scores with check for pre-computed values"""
+    if 'prob_uncertainty' not in adata.uns:
+        print("→ Computing prob_uncertainty...")
+        adata = prob_uncertainty(adata)
     else:
-        print("→ Using pre-computed uncertainty from adata.uns")
-    print("→ Plotting uncertainty...")
+        print("→ Using pre-computed prob_uncertainty from adata.uns")
+    print("→ Plotting prob_uncertainty...")
     adata_query = adata[adata.obs["ref_query"] == "query"].copy()
-    adata_query.obs["uncertainty"] = adata.uns['uncertainty']
+    adata_query.obs["prob_uncertainty"] = adata.uns['prob_uncertainty']
     # sc.pl.umap 绘图，但 fig=plt.gcf() 
-    sc.pl.umap(adata_query, color="uncertainty", title="Uncertainty", show=False, frameon=False, cmap='RdBu_r')
+    sc.pl.umap(adata_query, color="prob_uncertainty", title="Prob_uncertainty", show=False, frameon=False, cmap='RdBu_r')
     
     # 获取当前图形对象
     fig = plt.gcf()
@@ -39,12 +39,43 @@ def plot_uncertainty(adata, output_dir="./"):
 
     # 2. 保存时使用 bbox_inches='tight' 修正图例截断并设置 DPI
     plt.savefig(
-        os.path.join(output_dir, "uncertainty_plot.pdf"),
+        os.path.join(output_dir, "prob_uncertainty_plot.pdf"),
         bbox_inches='tight', # 确保图例不被截断
         dpi=300              # 设置栅格化图像的分辨率
     )
-    print("✅ Saved: uncertainty_plot.pdf")
+    print("✅ Saved: prob_uncertainty_plot.pdf")
 
+
+def plot_dist_uncertainty(adata, output_dir="./"):
+    """Plot cell dist_uncertainty scores with check for pre-computed values"""
+    if 'dist_uncertainty' not in adata.uns:
+        print("→ Computing dist_uncertainty...")
+        adata = dist_uncertainty(adata)
+    else:
+        print("→ Using pre-computed dist_uncertainty from adata.uns")
+    print("→ Plotting dist_uncertainty...")
+    adata_query = adata[adata.obs["ref_query"] == "query"].copy()
+    adata_query.obs["dist_uncertainty"] = adata.uns['dist_uncertainty']
+    # sc.pl.umap 绘图，但 fig=plt.gcf() 
+    sc.pl.umap(adata_query, color="dist_uncertainty", title="Dist_uncertainty", show=False, frameon=False, cmap='RdBu_r')
+    
+    # 获取当前图形对象
+    fig = plt.gcf()
+    
+    # 1. 栅格化点位以减小 PDF 文件大小
+    for ax in fig.get_axes():
+        for child in ax.get_children():
+            # 识别散点图的点集 (PathCollection)
+            if isinstance(child, PathCollection):
+                child.set_rasterized(True) # 启用栅格化
+
+    # 2. 保存时使用 bbox_inches='tight' 修正图例截断并设置 DPI
+    plt.savefig(
+        os.path.join(output_dir, "dist_uncertainty_plot.pdf"),
+        bbox_inches='tight', # 确保图例不被截断
+        dpi=300              # 设置栅格化图像的分辨率
+    )
+    print("✅ Saved: dist_uncertainty_plot.pdf")
 
 def plot_DAlogFC(adata, output_dir=".", **kwargs):
     """Plot cell DAlogFC scores with check for pre-computed values"""
@@ -62,7 +93,6 @@ def plot_DAlogFC(adata, output_dir=".", **kwargs):
     milopl.plot_nhood_graph(
         adata,
         show=False,
-        min_size=1,
         **kwargs
     )
     
@@ -175,7 +205,8 @@ def plot_all_methods(adata, output_dir="./"):
 
 
     print(f"=== Visualizing  ===")
-    plot_uncertainty(adata, output_dir)
+    plot_prob_uncertainty(adata, output_dir)
+    plot_dist_uncertainty(adata, output_dir)
     plot_DAlogFC(adata, output_dir)
     plot_mapQC(adata, output_dir)
     print(f"✅ All visualizations complete .")

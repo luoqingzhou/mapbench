@@ -2,7 +2,10 @@ import numpy as np
 import pandas as pd
 from sklearn.neighbors import KNeighborsTransformer
 
-def uncertainty(
+
+
+## prob_uncertainty
+def prob_uncertainty(
     adata,
     embedding="X",
     label_key="cell_type",
@@ -102,9 +105,9 @@ def uncertainty(
     pred_labels = pd.Series(pred_labels, index=query_adata.obs_names, name="pred_label")
     uncertainties = pd.Series(uncertainties, index=query_adata.obs_names, name="uncertainty")
 
-    print("Uncertainty calculation finished!")
+    print("Prob_uncertainty calculation finished!")
 
-    adata.uns['uncertainty'] = uncertainties
+    adata.uns['prob_uncertainty'] = uncertainties
     if return_adata:
         return adata
     # return pred_labels, uncertainties
